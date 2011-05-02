@@ -28,6 +28,10 @@ class UserStreamListener(tweepy.StreamListener):
     def on_data(self, data):
         try:
             data = json.loads(data)
+            if "event" in data:
+              print data["event"]
+              print data
+
             if "event" in data and data["event"] == "favorite":
                 auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
                 auth.set_access_token(settings.ACCESS_TOKEN, settings.ACCESS_SECRET)
@@ -37,7 +41,12 @@ class UserStreamListener(tweepy.StreamListener):
                     u"綺羅星",
                 ] 
                 ta.update_status(random.choice(update_list))
+            elif "event" in data and data["event"] == "list_member_added":
+                auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
+                auth.set_access_token(settings.ACCESS_TOKEN, settings.ACCESS_SECRET)
+                ta = tweepy.API(auth)
 
+                ta.update_status(u"%sに颯爽登場！" % data["target_object"]["full_name"])
             elif "in_reply_to_status_id" in data:
                 if "event" in data:
                     pass
