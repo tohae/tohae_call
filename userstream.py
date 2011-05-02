@@ -47,6 +47,12 @@ class UserStreamListener(tweepy.StreamListener):
                 ta = tweepy.API(auth)
 
                 ta.update_status(u"%sに颯爽登場！" % data["target_object"]["full_name"])
+            elif "event" in data and data["event"] == "follow":
+                auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
+                auth.set_access_token(settings.ACCESS_TOKEN, settings.ACCESS_SECRET)
+                ta = tweepy.API(auth)
+                ta.create_friendship(screen_name = data["source"]["screen_name"])
+
             elif "in_reply_to_status_id" in data:
                 if "event" in data:
                     pass
