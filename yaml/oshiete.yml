@@ -1,0 +1,4 @@
+pattern:
+  - "教えて"
+  - "おしえて"
+is_reply: True
