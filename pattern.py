@@ -143,6 +143,8 @@ class Pizza(AbstractPattern): pass
 
 class Syazai(AbstractPattern): pass
 
+class Hagemasite(AbstractPattern): pass
+
 class Other(AbstractPattern):
     def match(self):
         return True
@@ -678,6 +680,7 @@ REPLIES =(
     Elshaddai,
     Syazai,
     Tiqav,
+    Hagemasite,
     #Translation,
 )
 
