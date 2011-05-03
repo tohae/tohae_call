@@ -26,72 +26,73 @@ class UserStream(tweepy.Stream):
 class UserStreamListener(tweepy.StreamListener):
     
     def on_data(self, data):
-        try:
-            data = json.loads(data)
-            if "event" in data:
-              print data["event"]
-              print data
+        data = json.loads(data)
 
-            if "event" in data and data["event"] == "favorite":
-                auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
-                auth.set_access_token(settings.ACCESS_TOKEN, settings.ACCESS_SECRET)
-                ta = tweepy.API(auth)
-                update_list = [u"何勝手にふぁぼってんの？", u"無断favorite禁止！",u"ふぁぼってくれてありがとう…（／／／）",
+        auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
+        auth.set_access_token(settings.ACCESS_TOKEN, settings.ACCESS_SECRET)
+        ta = tweepy.API(auth)
+        if "event" in data:
+            if data["event"] == "favorite":
+                update_list = [
+                    u"何勝手にふぁぼってんの？",
+                    u"無断favorite禁止！",
+                    u"ふぁぼってくれてありがとう…（／／／）",
                     u"きらっ☆（ゝω・）v",
                     u"綺羅星",
                 ] 
                 ta.update_status(random.choice(update_list))
-            elif "event" in data and data["event"] == "list_member_added":
-                auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
-                auth.set_access_token(settings.ACCESS_TOKEN, settings.ACCESS_SECRET)
-                ta = tweepy.API(auth)
-
+            elif data["event"] == "list_member_added":
                 ta.update_status(u"%sに颯爽登場！" % data["target_object"]["full_name"])
-            elif "event" in data and data["event"] == "follow":
-                auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
-                auth.set_access_token(settings.ACCESS_TOKEN, settings.ACCESS_SECRET)
-                ta = tweepy.API(auth)
+            elif data["event"] == "follow":
                 ta.create_friendship(screen_name = data["source"]["screen_name"])
 
-            elif "in_reply_to_status_id" in data:
-                if "event" in data:
-                    pass
+        elif "in_reply_to_status_id" in data:
+            status = Status.parse(self.api, data)
+            if pattern.reply(status.text):
+                patterns = pattern.REPLIES + pattern.PATTERNS + pattern.OTHER
+            else:
+                patterns = pattern.PATTERNS
+
+            for p in patterns:
+                ap = p(status.text,status.user.screen_name)
+                if ap.match():
+                    print ap.__class__.__name__
+                    update = ap.update()
+                    break
+            else:
+                update = False
+
+            # update文字が空でなく、相手がNGユーザーでない場合
+            if self.is_update(update, status.user.screen_name):
+                              
+                # リプライするパターンであれば、@とin_reply_to_status_idをつける
+                if ap.is_reply():
+                    update = "@%s %s" % ( status.user.screen_name , update)
+                    ta.update_status(update,status.id)
                 else:
-                    status = Status.parse(self.api, data)
-                    if pattern.reply(status.text):
-                        patterns = pattern.REPLIES + pattern.PATTERNS + pattern.OTHER
-                    else:
-                        patterns = pattern.PATTERNS
+                    ta.update_status(update)
 
-                    for p in patterns:
-                        ap = p(status.text,status.user.screen_name)
-                        if ap.match():
-                            print ap.__class__.__name__
-                            update = ap.update()
-                            break
-                    else:
-                        update = False
+    def is_update(self, update, screen_name):
+        ng_users = [
+          "tohae_call",
+          "fuba_recorder",
+          "Korok",
+          "call_juiz",
+        ]
 
-                    if update and status.user.screen_name != "tohae_call" and status.user.screen_name != "fuba_recorder" and status.user.screen_name !="Korok" and status.user.screen_name != "call_juiz":
-                        auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
-                        auth.set_access_token(settings.ACCESS_TOKEN, settings.ACCESS_SECRET)
-                        ta = tweepy.API(auth)
-                        
-                        if ap.is_reply():
-                            update = "@%s %s" % ( status.user.screen_name , update)
-                            ta.update_status(update,status.id)
-                        else:
-                            ta.update_status(update)
-        except Exception, e:
-            print e
+        if not update or screen_name in ng_users:
+            return False
+        else:
+            return True
 
 
 
 if __name__ == "__main__":
-    auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
-    auth.set_access_token(settings.ACCESS_TOKEN, settings.ACCESS_SECRET)
-    us = UserStream(auth,UserStreamListener(),timeout = None)
-    us.user_stream()
-    #a.update_status("hogehoge")
-    #stream = tweepy.Stream(auth, StreamWatcherListener(), timeout=None)
+    try:
+        auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
+        auth.set_access_token(settings.ACCESS_TOKEN, settings.ACCESS_SECRET)
+        us = UserStream(auth,UserStreamListener(),timeout = None)
+        us.user_stream()
+    except Exception, e:
+        print e
 
