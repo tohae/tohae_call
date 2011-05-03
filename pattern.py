@@ -145,6 +145,8 @@ class Syazai(AbstractPattern): pass
 
 class Hagemasite(AbstractPattern): pass
 
+class Tanoshingo(AbstractPattern): pass
+
 class Other(AbstractPattern):
     def match(self):
         return True
@@ -681,6 +683,7 @@ REPLIES =(
     Syazai,
     Tiqav,
     Hagemasite,
+    Tanoshingo,
     #Translation,
 )
 
