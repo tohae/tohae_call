@@ -72,6 +72,12 @@ class UserStreamListener(tweepy.StreamListener):
                         ta.update_status(update,status.id)
                     else:
                         ta.update_status(update)
+            
+            # cron
+            for p in pattern.CRON:
+                ap = p()
+                if ap.match():
+                    ta.update_status(ap.update())
 
         except Exception, e:
             print e

@@ -5,7 +5,6 @@ import random
 from pyquery import PyQuery as pq
 import urllib
 import urllib2
-import cookielib
 import feedparser
 import json
 import operator
@@ -118,15 +117,36 @@ class Nandeinaino(AbstractPattern):
         return ta.user_timeline(screen_name = "tohae")[0].source
         
 
-class Zawa(AbstractPattern):
-    pass
+class Zawa(AbstractPattern): pass
+
+class Tohaesan(AbstractPattern): pass
+
+class Love(AbstractPattern): pass
+
+class Kirai(AbstractPattern): pass
+
+class Shinitai(AbstractPattern): pass
+
+class Elshaddai(AbstractPattern): pass
+
+class Sayurisan(AbstractPattern): pass
+
+class Aisatsu(AbstractPattern): pass
+
+class Help(AbstractPattern): pass
+
+class Yamada(AbstractPattern): pass
+
+class Douitasimasite(AbstractPattern): pass
+
+class Pizza(AbstractPattern): pass
+
+class Syazai(AbstractPattern): pass
 
 class Other(AbstractPattern):
     def match(self):
         return True
     
-class Tohaesan(AbstractPattern):
-  pass
       
 #class Food(AbstractPattern):
 #    def __init__(self,text,posted_user=""):
@@ -184,17 +204,6 @@ class Nyaa(AbstractPattern):
             self._is_reply = True
         return self._is_reply
 
-class Love(AbstractPattern):
-  pass
-
-class Kirai(AbstractPattern):
-  pass
-
-class Shinitai(AbstractPattern):
-  pass
-
-class Elshaddai(AbstractPattern):
-  pass
 
 class Findjob(AbstractPattern):
     def update(self):
@@ -415,8 +424,6 @@ class Harahe(AbstractPattern):
         return u"とはえを誘って、「%s 『%s』」に行けば良いと思うよ！ %s" % (shop_catch, shop_name, shop_url)
     
 
-class Sayurisan(AbstractPattern):
-  pass
 
 
 #TODO 中日戦の結果
@@ -480,7 +487,7 @@ class Baseball(AbstractPattern):
 
 class Eco(CronPattern):
     def match(self):
-        return self.hour == 22 and 0 <= self.minute <2
+        return self.hour == 15 and self.minute == 11
 
     def update(self):
         url = "http://eco.nikkeibp.co.jp/rss/eco/eco.rdf"
@@ -488,7 +495,8 @@ class Eco(CronPattern):
         title = d.entries[0].title
         link = d.entries[0].link
         category = d.entries[0].tags[0]["term"].split("_")[1]
-        return "とはえこニュース:【%s】%s %s" % ( category,title,link)
+        return u"とはえこニュース:【%s】%s %s" % ( category,title,link)
+
 
 class Birthday(CronPattern):
     def match(self):
@@ -561,11 +569,7 @@ class Rouhikun(AbstractPattern):
         return self._is_reply
 
 
-class Aisatsu(AbstractPattern):
-  pass
 
-class Help(AbstractPattern):
-  pass
 
 class Weather(AbstractPattern):
     def update(self):
@@ -592,8 +596,6 @@ class Weather(AbstractPattern):
 
         return update
 
-class Yamada(AbstractPattern):
-  pass
 
 class Translation(AbstractPattern):
     def match(self):
@@ -624,11 +626,7 @@ class Tsuitou(AbstractPattern):
     def update(self):
         return self.posted_user + u"追悼…"
 
-class Douitasimasite(AbstractPattern):
-  pass
 
-class Pizza(AbstractPattern):
-  pass
 
 class Echo(AbstractPattern):
     def update(self):
@@ -646,8 +644,6 @@ class Tiqav(AbstractPattern):
         else:
             return "http://tiqav.com" + d(".box a").attr("href")
 
-class Syazai(AbstractPattern):
-  pass
 
 
 PATTERNS =(
@@ -690,7 +686,6 @@ OTHER = (
 )
 
 CRON =(
-#    Minnnanotaisou,
     Eco,
     PupeRemind,
     Birthday,
