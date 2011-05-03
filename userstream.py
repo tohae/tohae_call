@@ -35,11 +35,13 @@ class UserStreamListener(tweepy.StreamListener):
             if "event" in data:
                 if data["event"] == "favorite":
                     update_list = [
-                        u"何勝手にふぁぼってんの？",
-                        u"無断favorite禁止！",
-                        u"ふぁぼってくれてありがとう…（／／／）",
                         u"きらっ☆（ゝω・）v",
                         u"綺羅星",
+                        u"あっ、流れ星",
+                        u"favoriteいただきましたー",
+                        u"tweetする者にとってfavoriteは寿命！",
+                        u"こんなものに星をつけるなんて、訳がわからないよ",
+                        u"favは命より重い・・・！",
                     ] 
                     ta.update_status(random.choice(update_list))
                 elif data["event"] == "list_member_added":
