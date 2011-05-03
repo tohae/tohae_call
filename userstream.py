@@ -6,6 +6,7 @@ import json
 import pattern
 from tweepy.models import Status
 import random
+from redis import Redis
 
 
 class UserStream(tweepy.Stream):
@@ -51,6 +52,17 @@ class UserStreamListener(tweepy.StreamListener):
 
             elif "in_reply_to_status_id" in data:
                 status = Status.parse(self.api, data)
+
+                # リピート機能
+                if status.user.screen_name != "tohae_call":
+                    redis = Redis()
+                    if redis.get(status.text):
+                        ta.update_status(status.text)
+                        redis.delete(status.text)
+                    else:
+                        redis.set(status.text,1)
+                        redis.expire(status.text,60 * 3)
+
                 if pattern.reply(status.text):
                     patterns = pattern.REPLIES + pattern.PATTERNS + pattern.OTHER
                 else:
