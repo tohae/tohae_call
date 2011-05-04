@@ -1,5 +1,6 @@
 # -*- coding:utf8 -*-
 from pattern import AbstractPattern
+import datetime
 
 class CronPattern(AbstractPattern):
     def __init__(self):
