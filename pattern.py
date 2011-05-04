@@ -9,7 +9,6 @@ import feedparser
 import json
 import operator
 from dateutil import relativedelta
-import calendar
 import yaml
 import tweepy
 import settings
