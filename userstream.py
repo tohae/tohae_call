@@ -28,6 +28,7 @@ class UserStreamListener(tweepy.StreamListener):
     
     def on_data(self, data):
         try:
+            raw_data = data
             data = json.loads(data)
 
             auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
@@ -50,8 +51,15 @@ class UserStreamListener(tweepy.StreamListener):
                 elif data["event"] == "follow":
                     ta.create_friendship(screen_name = data["source"]["screen_name"])
 
+            elif "retweeted_status" in data:
+                # RTの場合
+                pass  
+
             elif "in_reply_to_status_id" in data:
                 status = Status.parse(self.api, data)
+
+                if status.user.screen_name == "tohae_call_echo":
+                    print raw_data
 
                 # リピート機能
                 if status.user.screen_name != "tohae_call":
