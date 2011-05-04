@@ -4,6 +4,7 @@ import settings
 import urllib
 import json
 import pattern
+import cron_pattern
 from tweepy.models import Status
 import random
 from redis import Redis
@@ -58,9 +59,6 @@ class UserStreamListener(tweepy.StreamListener):
             elif "in_reply_to_status_id" in data:
                 status = Status.parse(self.api, data)
 
-                if status.user.screen_name == "tohae_call_echo":
-                    print raw_data
-
                 # リピート機能
                 if status.user.screen_name != "tohae_call":
                     redis = Redis()
@@ -71,6 +69,7 @@ class UserStreamListener(tweepy.StreamListener):
                         redis.set(status.text,1)
                         redis.expire(status.text,60 * 3)
 
+                # テキストがmentionかそれに相当するものであった場合
                 if pattern.reply(status.text):
                     patterns = pattern.REPLIES + pattern.PATTERNS + pattern.OTHER
                 else:
@@ -96,7 +95,7 @@ class UserStreamListener(tweepy.StreamListener):
                         ta.update_status(update)
             
             # cron
-            for p in pattern.CRON:
+            for p in cron_pattern.CRON:
                 ap = p()
                 if ap.match():
                     ta.update_status(ap.update())
