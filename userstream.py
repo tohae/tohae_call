@@ -5,7 +5,7 @@ import urllib
 import json
 import pattern
 import cron_pattern
-from tweepy.models import Status
+from status import Status
 import random
 from redis import Redis
 
@@ -70,13 +70,13 @@ class UserStreamListener(tweepy.StreamListener):
                         redis.expire(status.text,60 * 3)
 
                 # テキストがmentionかそれに相当するものであった場合
-                if pattern.reply(status.text):
+                if status.is_reply():
                     patterns = pattern.REPLIES + pattern.PATTERNS + pattern.OTHER
                 else:
                     patterns = pattern.PATTERNS
 
                 for p in patterns:
-                    ap = p(status.text,status.user.screen_name)
+                    ap = p(status)
                     if ap.match():
                         print ap.__class__.__name__
                         update = ap.update()

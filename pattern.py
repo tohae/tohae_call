@@ -13,34 +13,12 @@ import yaml
 import tweepy
 import settings
 
-def reply(text):
-    pattern = (
-        u"@tohae_call",
-        u"@トハエコ",
-        u"@とはえコ",
-        u"@とはえこ",
-        u"@とはえコール",
-    )
-    p = re.compile("|".join(pattern))
-    return p.match(text)
-
-def keyphrase_extract(text):
-    url = "http://jlp.yahooapis.jp/KeyphraseService/V1/extract"
-    params = {
-        "appid": settings.YAHOO_APPID,
-        "sentence":text.encode("utf-8"),
-        "output":"json",
-    }
-    json_data = urllib2.urlopen(url,urllib.urlencode(params)).read()
-    result = json.loads(json_data)
-    return result
-
 
 # 必ずこれを継承する
 class AbstractPattern(object):
-    def __init__(self,text,posted_user=""):
-        self.text = text
-        self.posted_user = posted_user
+    def __init__(self,status):
+        self.status = status
+        self.text = status.text
         class_name =  self.__class__.__name__.lower()
         self.yaml = yaml.load(open("yaml/%s.yml" % class_name))
         if "is_reply" in self.yaml:
@@ -256,7 +234,7 @@ class Oshiete(AbstractPattern):
             title = d.entries[0].title
             link = d.entries[0].link
         else:
-            phrase = keyphrase_extract(text)
+            phrase = self.status.extract_keyphrase()
             if phrase:
                 sorted_list = sorted(phrase.items(),key=operator.itemgetter(1),reverse=True)
                 params["MT"] = " ".join([ a[0] for a in sorted_list[0:1]]).encode("euc-jp")
@@ -383,7 +361,7 @@ class Harahe(AbstractPattern):
             "format":"json",
             "type":"lite",
         }
-        phrase = keyphrase_extract("".join(re.split(u" |　",self.text)[1:]))
+        phrase = self.status.extract_keyphrase()
         if phrase:
             sorted_list = sorted(phrase.items(),key=operator.itemgetter(1),reverse=True)
             params["keyword"] = " ".join([ a[0] for a in sorted_list[0:2]]).encode("utf-8")
@@ -559,7 +537,7 @@ class Len(AbstractPattern):
 
 class Tsuitou(AbstractPattern):
     def update(self):
-        return self.posted_user + u"追悼…"
+        return self.status.user.screen_name + u"追悼…"
 
 
 

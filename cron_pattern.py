@@ -2,6 +2,7 @@
 from pattern import AbstractPattern
 import datetime
 import calendar
+import feedparser
 
 class CronPattern(AbstractPattern):
     def __init__(self):
@@ -40,19 +41,15 @@ class Birthday(CronPattern):
             (1,1,"とはえ甥",),
             (1,5,"mirakui",),
             (1,10,"riafel",),
-            (1,18,"t_meitei",),
             (3,9,"yokochie",),
             (3,18,"fykr",),
             (4,18,"magic_holic",),
-            (5,12,"Azmin",),
             (5,12,"Azmin",),
             (5,20,"plus7minus11",),
             (8,1,"haseryo",),
             (9,15,"navigatoria",),
             (10,29,"ono_matope",),
-            (11,18,"wolf_robin",),
             (10,15,"makimoto",),
-            (12,19,"haseryo",),
         ]
 
         if self.hour == 0 and 0 <= self.minute <2:
